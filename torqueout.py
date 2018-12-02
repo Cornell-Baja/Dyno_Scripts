@@ -33,6 +33,12 @@ print("Opened a LabJack with Device type: %i, Connection type: %i,\n" \
     (info[0], info[1], info[2], ljm.numberToIP(info[3]), info[4], info[5]))
 
 try:
+    aNames = ["AIN1_EF_INDEX",    #setup what extended feeature to use -- thermocouple type
+    "AIN2_EF_INDEX"]          #reference for on board temperature Sensor
+
+    aValues = [1,                # 22 --> K type thermocouple
+    1]                        # register value for on board temperature reference
+    ljm.eWriteNames(handle, len(aNames), aNames, aValues)
     output_names = ["TIME", "VOLTAGE_1", "VOLTAGE_2", "TORQUE"]
     start = datetime.now()
 
@@ -45,8 +51,8 @@ try:
     start = time.time()
     while True:
         ref = time.time() - start
-        voltage1 = ljm.eReadName(handle, "DIO0_EF_READ_A")
-        voltage2 = ljm.eReadName(handle, "DIO1_EF_READ_A")
+        voltage1 = ljm.eReadName(handle, "AIN1_EF_READ_A")
+        voltage2 = ljm.eReadName(handle, "AIN2_EF_READ_A")
 
         #torque output is linear 5v to -5v
         if (voltage1 > 0):
@@ -61,7 +67,7 @@ try:
         with open(cur_log,'a') as f:
           write = csv.writer(f)
           write.writerow(output_values)
-        time.sleep(20)
+        time.sleep(5)
 
     end = datetime.now()
 
